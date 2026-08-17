@@ -100,7 +100,7 @@ jobs:
         with:
           files: |
             DeepSeek-Windows.zip
-            DeepSeek-Setup-1.0.1.exe
+            DeepSeek-Setup-1.0.2.exe
           fail_on_unmatched_files: true
           name: DeepSeek for Windows ${{ github.ref_name }}
           generate_release_notes: true

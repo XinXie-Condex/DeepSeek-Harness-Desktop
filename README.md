@@ -33,7 +33,7 @@
 
 ### Windows
 
-1. 下载 `DeepSeek-Setup-1.0.1.exe`（安装向导，推荐）或 `DeepSeek-Windows.zip`（绿色版）
+1. 下载 `DeepSeek-Setup-1.0.2.exe`（安装向导，推荐）或 `DeepSeek-Windows.zip`（绿色版）
 2. 安装向导：一路 Next 即可；绿色版：解压后双击 `DeepSeek.exe`
 3. 需要系统已安装 **Microsoft Edge WebView2 Runtime**（Windows 10/11 一般已自带）
 
@@ -73,7 +73,7 @@
 `windows/` 目录为 Windows 版源码（C# WPF + WebView2），构建已完全自动化：
 
 - 推送 `windows/**` 改动 → `.github/workflows/build-windows.yml` 自动构建，
-  产出 `DeepSeek-Windows.zip` + `DeepSeek-Setup-1.0.1.exe`（Actions Artifacts）
+  产出 `DeepSeek-Windows.zip` + `DeepSeek-Setup-1.0.2.exe`（Actions Artifacts）
 - 推送 `mac-v*` / `win-v*` 标签 → 对应工作流自动发布 GitHub Release（macOS: `release-macos.yml`，Windows: `release-windows.yml`）
 - 本地构建：`cd windows && dotnet publish -c Release`（需 .NET 8 SDK + `EnableWindowsTargeting`）
 

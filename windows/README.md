@@ -14,7 +14,7 @@ Windows 版桌面应用：C# WPF + WebView2 承载 DeepSeek Harness Web UI，效
 
 | 文件 | 说明 |
 |------|------|
-| `DeepSeek-Setup-1.0.1.exe` | Inno Setup 安装向导（装到 Program Files、桌面/开始菜单快捷方式、卸载程序） |
+| `DeepSeek-Setup-1.0.2.exe` | Inno Setup 安装向导（装到 Program Files、桌面/开始菜单快捷方式、卸载程序） |
 | `DeepSeek-Windows.zip` | 绿色版，解压即用 |
 
 ## 🔧 开发 / 构建

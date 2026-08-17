@@ -96,13 +96,13 @@ jobs:
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           if (-not (Test-Path $iscc)) { throw "ISCC.exe not found" }
           & $iscc DeepSeekSetup.iss
-          if (-not (Test-Path "DeepSeek-Setup-1.0.1.exe")) { throw "installer build failed" }
+          if (-not (Test-Path "DeepSeek-Setup-1.0.2.exe")) { throw "installer build failed" }
 
       - name: Zip distribution
         shell: pwsh
         run: |
           Compress-Archive -Path windows/publish/* -DestinationPath DeepSeek-Windows.zip -Force
-          Get-Item DeepSeek-Windows.zip, DeepSeek-Setup-1.0.1.exe | Select-Object Name, Length
+          Get-Item DeepSeek-Windows.zip, DeepSeek-Setup-1.0.2.exe | Select-Object Name, Length
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -110,4 +110,4 @@ jobs:
           name: DeepSeek-Windows
           path: |
             DeepSeek-Windows.zip
-            DeepSeek-Setup-1.0.1.exe
+            DeepSeek-Setup-1.0.2.exe
