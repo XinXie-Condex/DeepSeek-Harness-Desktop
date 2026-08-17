@@ -12,7 +12,7 @@ namespace DeepSeekDesktop;
 public partial class SplashWindow : Window
 {
     private const string Line1Text = "DeepSeek Harness";
-    private const string Line2Text = "for Mac";
+    private const string Line2Text = "for Windows";
 
     private readonly List<TextBlock> _line1Blocks = new();
     private readonly List<TextBlock> _line2Blocks = new();

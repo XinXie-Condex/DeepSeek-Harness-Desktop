@@ -6,9 +6,9 @@ Windows 版桌面应用：C# WPF + WebView2 承载 DeepSeek Harness Web UI，效
 
 - **原生窗口**：WPF + Microsoft Edge WebView2，无需浏览器
 - **内置运行时**：自带 Node.js（Windows x64）与 `dsh` 包，自动启动本地服务
-- **启动动画**：鲸鱼 logo + "DeepSeek Harness / for Mac" + by Condex（约 5 秒）
+- **启动动画**：鲸鱼 logo + "DeepSeek Harness / for Windows" + by Condex（约 5 秒）
 - **智能服务生命周期**：复用已在运行的服务器（默认端口 3080），退出时清理自己拉起的进程
-- **防篡改**：启动时校验关键文件哈希（与 Mac 版同一机制）
+- **防篡改**：macOS 版启动时校验关键文件哈希；Windows 版暂未实现
 
 ## 📦 分发形式
 
@@ -22,7 +22,7 @@ Windows 版桌面应用：C# WPF + WebView2 承载 DeepSeek Harness Web UI，效
 ### GitHub Actions（推荐，自动构建）
 
 - 推送 `windows/**` 改动 → `build-windows.yml` 自动构建（编译 + 下载 Node + `npm install` dsh + 冒烟测试 + 打包）
-- 推送 `v*` / `win-v*` 标签 → `release-windows.yml` 自动发布 GitHub Release
+- 推送 `mac-v*` / `win-v*` 标签 → `release-windows.yml` 自动发布 Windows GitHub Release
 
 ### 本地构建
 

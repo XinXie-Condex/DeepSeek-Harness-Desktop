@@ -13,6 +13,7 @@ public sealed class ServerManager : IDisposable
 {
     private Process? _serverProcess;
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(2) };
+    private readonly object _logLock = new();
 
     /// <summary>目标端口：环境变量 DSH_DESKTOP_PORT 优先，默认 3080。</summary>
     public int PreferredPort
@@ -83,6 +84,8 @@ public sealed class ServerManager : IDisposable
             WorkingDirectory = Path.Combine(root, "runtime", "bundle"),
             UseShellExecute = false,
             CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
         };
         psi.ArgumentList.Add(bin);
         psi.ArgumentList.Add("web");
@@ -94,7 +97,29 @@ public sealed class ServerManager : IDisposable
             psi.Environment["DSH_HOME"] = HomeOverride;
         }
 
+        var logDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "DeepSeek");
+        Directory.CreateDirectory(logDir);
+        var logFile = Path.Combine(logDir, "server.log");
+
         _serverProcess = Process.Start(psi);
+        if (_serverProcess != null)
+        {
+            _serverProcess.OutputDataReceived += (_, e) => AppendLog(logFile, e.Data);
+            _serverProcess.ErrorDataReceived += (_, e) => AppendLog(logFile, e.Data);
+            _serverProcess.BeginOutputReadLine();
+            _serverProcess.BeginErrorReadLine();
+        }
+    }
+
+    private void AppendLog(string file, string? line)
+    {
+        if (string.IsNullOrEmpty(line)) return;
+        lock (_logLock)
+        {
+            File.AppendAllText(file, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {line}{Environment.NewLine}");
+        }
     }
 
     /// <summary>退出时杀掉由本 App 拉起的整个进程树（Windows: Kill(true)）。</summary>
