@@ -1,0 +1,79 @@
+name: Release Linux
+
+on:
+  push:
+    tags:
+      - 'linux-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install system build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin libfuse2t64
+
+      - name: Assemble runtime
+        shell: bash
+        run: |
+          cd linux
+          ./build-linux.sh --runtime-only
+
+      - name: Smoke test server lifecycle
+        shell: bash
+        run: |
+          cd linux
+          rm -rf /tmp/dsh-linux-smoke
+          DSH_DESKTOP_PORT=3099 DSH_DESKTOP_HOME=/tmp/dsh-linux-smoke \
+            node test/server-manager.test.js
+
+      - name: Package AppImage, tar.gz, and deb
+        shell: bash
+        run: |
+          cd linux
+          ./build-linux.sh --skip-runtime
+
+      - name: Smoke test packaged binary
+        shell: bash
+        run: |
+          cd linux
+          rm -rf /tmp/dsh-packaged-smoke
+          DSH_DESKTOP_PORT=3099 DSH_DESKTOP_HOME=/tmp/dsh-packaged-smoke \
+            ./dist/linux-unpacked/deepseek --smoke-test \
+            --ozone-platform=headless --no-sandbox --disable-gpu | tee /tmp/dsh-packaged-smoke.log
+          # 退出码不够：命中单实例锁时 main.js 会直接 app.quit()，同样返回 0。
+          grep -q DSH_SMOKE_CLEAN /tmp/dsh-packaged-smoke.log
+
+      - name: Smoke test installed deb
+        shell: bash
+        run: |
+          cd linux
+          sudo apt-get install -y ./dist/DeepSeek-*.deb
+          grep -q -- '^Exec=.*--ozone-platform=x11' /usr/share/applications/deepseek.desktop
+          rm -rf /tmp/dsh-deb-smoke
+          DSH_DESKTOP_PORT=3099 DSH_DESKTOP_HOME=/tmp/dsh-deb-smoke \
+            deepseek --smoke-test --ozone-platform=headless --no-sandbox --disable-gpu | tee /tmp/dsh-deb-smoke.log
+          grep -q DSH_SMOKE_CLEAN /tmp/dsh-deb-smoke.log
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            linux/dist/DeepSeek-*.AppImage
+            linux/dist/DeepSeek-*.tar.gz
+            linux/dist/DeepSeek-*.deb
+          fail_on_unmatched_files: true
+          name: DeepSeek for Linux ${{ github.ref_name }}
+          generate_release_notes: true

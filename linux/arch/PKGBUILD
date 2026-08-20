@@ -1,0 +1,50 @@
+# Maintainer: ArKurt <dongzi24@outlook.com>
+# 在 Arch Linux 上本地构建并安装：
+#   cd linux/arch
+#   makepkg -si
+# 说明：应用代码来自 ArKurt/DeepSeek-Harness-Desktop 的 linux-v1.0.1 标签，
+#       dsh 原生模块会在 makepkg 时用系统 node 现场编译。
+#       若源码路径包含空格（node-gyp 限制），请用无空格目录构建，例如：
+#       BUILDDIR=/tmp/deepseek-build makepkg -si
+
+pkgname=deepseek-harness-desktop
+pkgver=1.0.1
+pkgrel=1
+pkgdesc="DeepSeek Harness Web UI desktop shell for Linux (Electron + bundled dsh)"
+arch=('x86_64')
+url="https://github.com/ArKurt/DeepSeek-Harness-Desktop"
+license=('custom')
+depends=('electron' 'nodejs' 'gtk3')
+makedepends=('git' 'npm' 'curl')
+source=("${pkgname}::git+https://github.com/ArKurt/DeepSeek-Harness-Desktop.git#tag=linux-v${pkgver}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd "${srcdir}/${pkgname}"
+  # 把需要写入的目录复制到独立构建目录，避免污染 git checkout。
+  rm -rf "${srcdir}/linux-build"
+  cp -a linux "${srcdir}/linux-build"
+}
+
+build() {
+  cd "${srcdir}/linux-build"
+  ./build-linux.sh --runtime-only --system-node
+}
+
+package() {
+  cd "${srcdir}/linux-build"
+
+  install -d "${pkgdir}/opt/deepseek/app"
+  install -d "${pkgdir}/opt/deepseek/runtime"
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/applications"
+  install -d "${pkgdir}/usr/share/icons/hicolor/512x512/apps"
+
+  cp -r src assets package.json "${pkgdir}/opt/deepseek/app/"
+  cp -r runtime/bundle "${pkgdir}/opt/deepseek/runtime/"
+  install -m644 runtime/integrity.json "${pkgdir}/opt/deepseek/runtime/integrity.json"
+
+  install -m755 arch/deepseek.sh "${pkgdir}/usr/bin/deepseek"
+  install -m644 arch/deepseek.desktop "${pkgdir}/usr/share/applications/deepseek.desktop"
+  install -m644 assets/icons/512x512.png "${pkgdir}/usr/share/icons/hicolor/512x512/apps/deepseek.png"
+}

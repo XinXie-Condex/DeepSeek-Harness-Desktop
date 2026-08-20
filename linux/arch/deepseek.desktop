@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=DeepSeek
+GenericName=DeepSeek Harness
+Comment=DeepSeek Harness Web UI 的本地桌面壳
+Exec=deepseek %U
+Icon=deepseek
+Terminal=false
+Categories=Utility;
+StartupWMClass=deepseek
+StartupNotify=true
+Keywords=DeepSeek;AI;Harness;

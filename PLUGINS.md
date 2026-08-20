@@ -5,6 +5,7 @@ DeepSeek Desktop 是 DeepSeek Harness Web UI 的本地桌面外壳。它启动�
 
 - macOS：`~/.dsh`
 - Windows：`%USERPROFILE%\.dsh`
+- Linux：`~/.dsh`
 
 插件也安装在用户数据目录里，**不会修改 `.app` / 安装目录中的文件**，因此不会触发
 桌面版启动时的 SHA256 防篡改校验。
@@ -18,6 +19,7 @@ DeepSeek Desktop 是 DeepSeek Harness Web UI 的本地桌面外壳。它启动�
 ```text
 macOS:   ~/.dsh/profiles/web
 Windows: %USERPROFILE%\.dsh\profiles\web
+Linux:   ~/.dsh/profiles/web
 ```
 
 所以只要给 `web` profile 安装插件，重新启动桌面版后就会自动加载。
@@ -115,6 +117,34 @@ dsh plugin --profile web add <插件包名>
 
 ---
 
+## 4A. Linux（Arch Linux）安装插件
+
+AppImage / tar.gz 版内置 Node 与 dsh，`--appimage-extract-and-run` 或绿色版的目录结构为
+`runtime/node` + `runtime/bundle/...`；Arch 包版使用系统 `node`。
+
+### 4A.1 Arch 包版（推荐）
+
+```bash
+dsh plugin --profile web add <插件包名>
+```
+
+### 4A.2 AppImage / tar.gz 版
+
+```bash
+# AppImage：先解包到 /tmp/deepseek-squashfs
+./DeepSeek-*.AppImage --appimage-extract-and-run  # 运行一次
+# 或
+./DeepSeek-*.AppImage --appimage-extract
+# 然后用解出的 runtime 执行：
+<解包目录>/squashfs-root/resources/runtime/node \
+  <解包目录>/squashfs-root/resources/runtime/bundle/node_modules/@deepseek-ai/dsh/lib/bin.js \
+  plugin --profile web add <插件包名>
+```
+
+> 注意：AppImage 的解包目录是只读的，插件实际安装在 `~/.dsh`，不会写入解包目录。
+
+---
+
 ## 5. 常用插件管理命令
 
 ```bash
@@ -164,6 +194,7 @@ dsh plugin --profile web list
 - 查看服务器日志：
   - macOS：`~/Library/Application Support/DeepSeek/server.log`
   - Windows：`%LOCALAPPDATA%\DeepSeek\server.log`
+  - Linux：`${XDG_STATE_HOME:-~/.local/state}/deepseek/server.log`
 - 先临时移除刚安装的插件，确认是否是插件本身导致 `dsh web` 崩溃：
 
 ```bash
@@ -189,6 +220,7 @@ dsh plugin --profile web remove <插件包名>
 
 - `DSH_DESKTOP_HOME`：自定义 dsh 数据目录。
 - `DSH_DESKTOP_PORT`：自定义端口。
+- Linux 另支持 `DSH_DESKTOP_NODE` / `DSH_DESKTOP_RUNTIME`，见 `linux/README.md`。
 
 例如 macOS：
 
